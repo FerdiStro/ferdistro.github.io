@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/ferdistro.github.io/static/css/main.0a6ede6d.css",
+    "main.js": "/ferdistro.github.io/static/js/main.d5de23c6.js",
+    "static/js/453.b08fb777.chunk.js": "/ferdistro.github.io/static/js/453.b08fb777.chunk.js",
+    "index.html": "/ferdistro.github.io/index.html",
+    "main.0a6ede6d.css.map": "/ferdistro.github.io/static/css/main.0a6ede6d.css.map",
+    "main.d5de23c6.js.map": "/ferdistro.github.io/static/js/main.d5de23c6.js.map",
+    "453.b08fb777.chunk.js.map": "/ferdistro.github.io/static/js/453.b08fb777.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.0a6ede6d.css",
+    "static/js/main.d5de23c6.js"
+  ]
+}
