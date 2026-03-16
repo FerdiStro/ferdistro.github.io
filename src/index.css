@@ -4,6 +4,7 @@
 
 
 body {
+    cursor: none;
     user-select: none;
     margin: 0;
     padding: 0;
@@ -16,6 +17,10 @@ body {
     sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+@media (hover: none) and (pointer: coarse) {
+    body { cursor: auto; }
 }
 
 code {

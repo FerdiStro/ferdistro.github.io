@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {useFrame, useLoader, useThree} from '@react-three/fiber'
 
 import * as THREE from 'three'
@@ -6,57 +6,49 @@ import * as THREE from 'three'
 import {useGLTF} from '@react-three/drei'
 import {TextureLoader} from "three";
 
-function Asteroid() {
+interface InputRef {
+    current: { x: number; y: number };
+}
+
+function Asteroid({inputRef}: { inputRef: InputRef }) {
     const {scene} = useGLTF('/models/asteroid.glb')
     const asteroidRef = useRef<THREE.Object3D>(null)
+    const scrollZ = useRef(0);
 
-    const [mouse, setMouse] = useState({x: 0, y: 0})
-
-    const passiveRotation = useRef(0);
-
-    //Mouse Rotation
     useEffect(() => {
-        const handleMouseMove = (event: MouseEvent) => {
-            const x = (event.clientX / window.innerWidth) * 2 - 1
-            const y = -(event.clientY / window.innerHeight) * 2 + 1
-            setMouse({x, y})
-        }
-        window.addEventListener('mousemove', handleMouseMove)
-        return () => window.removeEventListener('mousemove', handleMouseMove)
-    }, [])
-
-
-    // Passive Rotation
-    useEffect(() => {
-        const interval = setInterval(() => {
-            passiveRotation.current += 0.001;
-        }, 100);
-
-        return () => clearInterval(interval);
+        const h = () => {
+            const max = document.body.scrollHeight - window.innerHeight;
+            scrollZ.current = max > 0 ? window.scrollY / max : 0;
+        };
+        window.addEventListener('scroll', h, {passive: true});
+        return () => window.removeEventListener('scroll', h);
     }, []);
 
     useFrame(() => {
-        if (asteroidRef.current) {
-            asteroidRef.current.rotation.x += (mouse.y * 0.5 - asteroidRef.current.rotation.x) * 0.01
-            asteroidRef.current.rotation.y += (mouse.x * 0.5 - asteroidRef.current.rotation.y) * 0.05
+        const obj = asteroidRef.current;
+        if (!obj) return;
 
-            asteroidRef.current.rotation.y += passiveRotation.current;
-        }
+        obj.rotation.x += (inputRef.current.y * 1.2 - obj.rotation.x) * 0.04;
+        obj.rotation.y += (inputRef.current.x * 1.5 - obj.rotation.y) * 0.04;
+        obj.rotation.y += 0.003;
 
-
+        const baseX = window.innerWidth / 1000;
+        const baseY = window.innerHeight / 1000;
+        obj.position.x += (baseX + inputRef.current.x * 0.8 - obj.position.x) * 0.04;
+        obj.position.y += (baseY + inputRef.current.y * 0.5 - obj.position.y) * 0.04;
+        obj.position.z += (-scrollZ.current * 3 - obj.position.z) * 0.03;
     })
-    console.log(window.innerWidth)
 
-    return <primitive ref={asteroidRef} object={scene} scale={0.25} position={[window.innerWidth/ 1000 , window.innerHeight/ 1000, 0]}/>
+    return <primitive ref={asteroidRef} object={scene} scale={0.25} position={[window.innerWidth / 1000, window.innerHeight / 1000, 0]}/>
 }
 
 function StarBackground() {
     const texture = useLoader(TextureLoader, "/models/star_background.png");
-    const { viewport } = useThree();
+    const {viewport} = useThree();
 
     return (
         <mesh position={[0, 0, -5]}>
-            <planeGeometry args={[viewport.width + 20, viewport.height  + 20]} />
+            <planeGeometry args={[viewport.width + 20, viewport.height + 20]}/>
             <meshBasicMaterial
                 map={texture}
                 transparent
@@ -67,14 +59,11 @@ function StarBackground() {
     );
 }
 
-export default function BackgroundScene() {
+export default function BackgroundScene({inputRef}: { inputRef: InputRef }) {
     return (
         <>
-            <Asteroid/>
+            <Asteroid inputRef={inputRef}/>
             <StarBackground/>
         </>
-
     )
 }
-
-

@@ -1,27 +1,29 @@
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {useFrame, useThree} from '@react-three/fiber'
 import * as THREE from 'three'
 
 export function CursorCircle() {
     const {viewport} = useThree()
-    const [mouse, setMouse] = useState({x: 0, y: 0})
-    const meshRef = React.useRef<THREE.Mesh>(null)
+    const mouse = useRef({x: 0, y: 0})
+    const meshRef = useRef<THREE.Mesh>(null)
 
     useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            const x = ((e.clientX + window.scrollX) / window.innerWidth) * 2 - 1;
-            const y = (-(e.clientY + window.scrollY) / window.innerHeight) * 2 + 1;
-            setMouse({x, y});
+        const h = (e: MouseEvent) => {
+            mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.current.y = -(e.clientY / window.innerHeight) * 2 + 1;
         }
-        window.addEventListener('mousemove', handleMouseMove)
-        return () => window.removeEventListener('mousemove', handleMouseMove)
+        window.addEventListener('mousemove', h)
+        return () => window.removeEventListener('mousemove', h)
     }, [])
 
     useFrame(() => {
-        if (meshRef.current) {
-            meshRef.current.position.x += ((mouse.x * viewport.width) / 2 - meshRef.current.position.x) * 0.2
-            meshRef.current.position.y += ((mouse.y * viewport.height) / 2 - meshRef.current.position.y) * 0.2
+        if (!meshRef.current) return;
+        const target = {
+            x: (mouse.current.x * viewport.width) / 2,
+            y: (mouse.current.y * viewport.height) / 2,
         }
+        meshRef.current.position.x += (target.x - meshRef.current.position.x) * 0.15
+        meshRef.current.position.y += (target.y - meshRef.current.position.y) * 0.15
     })
 
     return (
